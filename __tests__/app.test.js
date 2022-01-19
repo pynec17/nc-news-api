@@ -106,10 +106,21 @@ describe("GET /api/articles", () => {
   // test no queries (should do default values)
   // test one of sort_by/order
   // test invalid query
-  test.only("queries", () => {
+  test("queries", () => {
     return request(app)
-      .get("/api/articles?sort_by=article_id&order=asc")
+      .get("/api/articles?topic=mitch&sort_by=article_id&order=asc")
       .expect(200)
       .then((res) => {});
+  });
+});
+
+// Endpoint 5
+
+describe("GET /api/articles/:article_id/comments", () => {
+  test.only("status 200 and returns array of comments", () => {
+    return request(app)
+      .get("/api/articles/9/comments")
+      .expect(200)
+      .then(() => {});
   });
 });

@@ -28,6 +28,18 @@ exports.updateArticleVotes = (body, article_id) => {
 };
 
 exports.selectArticles = (sort_by = "created_at", order = "desc", topic) => {
+  console.log(sort_by);
+  console.log(order);
+  console.log(topic);
+
+  // create variable list and start of SQL
+  const queryValues = [];
+  let sqlString = `SELECT articles.*, COUNT(comment_id) AS comment_count
+  FROM articles 
+  LEFT JOIN comments 
+  ON articles.article_id = comments.article_id`;
+
+  // sort_by conditional logic - error
   if (
     ![
       "article_id",
@@ -39,21 +51,27 @@ exports.selectArticles = (sort_by = "created_at", order = "desc", topic) => {
       "created_at",
     ].includes(sort_by)
   ) {
-    return Promise.reject({ status: 400, message: "Invalid query" });
+    return Promise.reject({ status: 400, message: "Invalid sort_by" });
   }
 
+  // order conditional logic - error
   if (!["asc", "desc"].includes(order)) {
-    return Promise.reject({ status: 400, message: "Invalid query" });
+    return Promise.reject({ status: 400, message: "Invalid order" });
   }
 
-  sqlString = `SELECT articles.*, COUNT(comment_id) AS comment_count
-  FROM articles 
-  LEFT JOIN comments 
-  ON articles.article_id = comments.article_id
-  GROUP BY articles.article_id
-  ORDER BY ${sort_by} ${order}`;
+  // topic conditional logic
 
-  return db.query(sqlString).then(({ rows }) => {
-    return rows;
-  });
+  if (topic) {
+    queryValues.push(topic);
+    sqlString += ` WHERE topic=$1 GROUP BY articles.article_id ORDER BY ${sort_by} ${order};`;
+
+    return db.query(sqlString, [topic]).then(({ rows }) => {
+      return rows;
+    });
+  } else {
+    sqlString += ` GROUP BY articles.article_id ORDER BY ${sort_by} ${order};`;
+    return db.query(sqlString).then(({ rows }) => {
+      return rows;
+    });
+  }
 };
