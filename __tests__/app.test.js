@@ -7,6 +7,7 @@ const app = require("../app.js");
 beforeEach(() => seed(testData));
 afterAll(() => db.end());
 
+// All invalid URLS
 describe("Invalid URL", () => {
   test("return status 404 and a message", () => {
     return request(app)
@@ -18,6 +19,7 @@ describe("Invalid URL", () => {
   });
 });
 
+// Endpoint 1 - Get all topics
 describe("GET /api/topics", () => {
   test("returns status 200 and array of topics", () => {
     return request(app)
@@ -29,15 +31,85 @@ describe("GET /api/topics", () => {
   });
 });
 
+// Endpoint 2 - Get article by ID
 describe("GET /api/articles/:article_id", () => {
   test("returns 200 and article object", () => {
     return request(app)
       .get("/api/articles/3")
       .expect(200)
       .then((res) => {
-        // expect to be object?
-        // expect to have length
-        // loop through, expect object containing etc
+        expect(res.body.article.article_id).toBe(3);
+        expect(res.body.article).toEqual(
+          expect.objectContaining({
+            article_id: expect.any(Number),
+            title: expect.any(String),
+            body: expect.any(String),
+            votes: expect.any(Number),
+            topic: expect.any(String),
+            author: expect.any(String),
+            // timestamp
+            comment_count: expect.any(String),
+          })
+        );
       });
+  });
+});
+
+//Endpoint 3 - Patch article votes
+
+describe("PATCH /api/articles/:article_id", () => {
+  test("return status 200 and updated article with incremented votes", () => {
+    return request(app)
+      .patch("/api/articles/3")
+      .send({ inc_votes: 10 })
+      .expect(200)
+      .then((res) => {
+        expect(res.body.article.votes).toBe(10);
+      });
+  });
+  test("return status 200 and updated article with decremented votes", () => {
+    return request(app)
+      .patch("/api/articles/1")
+      .send({ inc_votes: -10 })
+      .expect(200)
+      .then((res) => {
+        expect(res.body.article.votes).toBe(90);
+      });
+  });
+});
+
+// Endpoint 4
+
+describe("GET /api/articles", () => {
+  test("return status 200 and array of articles ", () => {
+    return request(app)
+      .get("/api/articles")
+      .expect(200)
+      .then((res) => {
+        expect(res.body.articles).toHaveLength(12);
+        res.body.articles.forEach((article) => {
+          expect(article).toEqual(
+            expect.objectContaining({
+              article_id: expect.any(Number),
+              title: expect.any(String),
+              body: expect.any(String),
+              votes: expect.any(Number),
+              topic: expect.any(String),
+              author: expect.any(String),
+              // timestamp
+              comment_count: expect.any(String),
+            })
+          );
+        });
+      });
+  });
+  // test no queries (should do default values)
+  // test one of sort_by/order
+  // test invalid query
+  test.only("queries", () => {
+    return request(app)
+      .get("/api/articles?sort_by=article_id&order=asc")
+      .expect(200)
+      .then((res) => {});
   });
 });
