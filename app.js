@@ -9,6 +9,7 @@ const {
 const {
   getCommentsByArticleID,
 } = require("./controllers/comments.controller.js");
+const { handle404s } = require("./errors.js");
 
 app.use(express.json());
 
@@ -18,9 +19,21 @@ app.patch("/api/articles/:article_id", patchArticleVotes);
 app.get("/api/articles", getArticles);
 app.get("/api/articles/:article_id/comments", getCommentsByArticleID);
 
-// handles all bad requests - doesn't catch valid request, isn't a 4-input error handler either
-app.all("*", (req, res) => {
-  res.status(404).send({ message: "Invalid URL" });
+// errors
+app.all("*", handle404s);
+
+app.use((err, req, res, next) => {
+  if (err.status) {
+    res.status(err.status).send({ message: err.message });
+  } else {
+    next(err);
+  }
+});
+
+app.use((err, req, res, next) => {
+  if (err.code === "22P02") {
+    res.status(400).send({ message: "Bad Request" });
+  }
 });
 
 module.exports = app;

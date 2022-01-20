@@ -4,20 +4,28 @@ const {
   selectArticles,
 } = require("../models/articles.model.js");
 
-exports.getArticleByID = (req, res) => {
+exports.getArticleByID = (req, res, next) => {
   const { article_id } = req.params;
 
-  selectArticleByID(article_id).then((article) => {
-    res.status(200).send({ article });
-  });
+  selectArticleByID(article_id)
+    .then((article) => {
+      res.status(200).send({ article });
+    })
+    .catch((err) => {
+      next(err);
+    });
 };
 
-exports.patchArticleVotes = (req, res) => {
+exports.patchArticleVotes = (req, res, next) => {
   const { article_id } = req.params;
 
-  updateArticleVotes(req.body, article_id).then((article) => {
-    res.status(200).send({ article });
-  });
+  updateArticleVotes(req.body, article_id)
+    .then((article) => {
+      res.status(200).send({ article });
+    })
+    .catch((err) => {
+      next(err);
+    });
 };
 
 exports.getArticles = (req, res) => {

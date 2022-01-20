@@ -10,12 +10,17 @@ exports.selectArticleByID = (article_id) => {
     GROUP BY articles.article_id;`;
 
   return db.query(articleQuery, [article_id]).then(({ rows }) => {
+    if (!rows[0]) {
+      return Promise.reject({ status: 404, message: "No Data Found" });
+    }
     return rows[0];
   });
 };
 
 exports.updateArticleVotes = (body, article_id) => {
-  console.log("in the model");
+  if (!body.inc_votes) {
+    return Promise.reject({ status: 400, message: "Bad Request" });
+  }
 
   return db
     .query(
@@ -23,6 +28,11 @@ exports.updateArticleVotes = (body, article_id) => {
       [body.inc_votes, article_id]
     )
     .then(({ rows }) => {
+      console.log(rows);
+      console.log(rows[0]);
+      if (!rows[0]) {
+        return Promise.reject({ status: 404, message: "No Data Found" });
+      }
       return rows[0];
     });
 };
@@ -70,6 +80,7 @@ exports.selectArticles = (sort_by = "created_at", order = "desc", topic) => {
     });
   } else {
     sqlString += ` GROUP BY articles.article_id ORDER BY ${sort_by} ${order};`;
+
     return db.query(sqlString).then(({ rows }) => {
       return rows;
     });

@@ -29,6 +29,15 @@ describe("GET /api/topics", () => {
         expect(res.body.topics.length).toBe(3);
       });
   });
+  test("returns status 404 and error message", () => {
+    return request(app)
+      .get("/api/topic/22/")
+      .expect(404)
+      .then((res) => {
+        console.log(res.body);
+        expect(res.body.message).toBe("Invalid URL");
+      });
+  });
 });
 
 // Endpoint 2 - Get article by ID
@@ -51,6 +60,22 @@ describe("GET /api/articles/:article_id", () => {
             comment_count: expect.any(String),
           })
         );
+      });
+  });
+  test("returns 404 not found if article_id out of range", () => {
+    return request(app)
+      .get("/api/articles/1000")
+      .expect(404)
+      .then((res) => {
+        expect(res.body.message).toBe("No Data Found");
+      });
+  });
+  test("returns 404 not found if article_id out of range", () => {
+    return request(app)
+      .get("/api/articles/g")
+      .expect(400)
+      .then((res) => {
+        expect(res.body.message).toBe("Bad Request");
       });
   });
 });
@@ -76,11 +101,40 @@ describe("PATCH /api/articles/:article_id", () => {
         expect(res.body.article.votes).toBe(90);
       });
   });
+
+  // Errors
+  test("return status 400 and message Bad Request - invalid value", () => {
+    return request(app)
+      .patch("/api/articles/1")
+      .send({ inc_votes: "a" })
+      .expect(400)
+      .then((res) => {
+        expect(res.body.message).toBe("Bad Request");
+      });
+  });
+  test("return status 400 and message Bad Request - empty object", () => {
+    return request(app)
+      .patch("/api/articles/1")
+      .send({})
+      .expect(400)
+      .then((res) => {
+        expect(res.body.message).toBe("Bad Request");
+      });
+  });
+  test("return status 404 and message No Data Found - article out of range", () => {
+    return request(app)
+      .patch("/api/articles/1000")
+      .send({ inc_votes: -10 })
+      .expect(404)
+      .then((res) => {
+        expect(res.body.message).toBe("No Data Found");
+      });
+  });
 });
 
 // Endpoint 4
 
-describe("GET /api/articles", () => {
+describe.only("GET /api/articles", () => {
   test("return status 200 and array of articles ", () => {
     return request(app)
       .get("/api/articles")
@@ -117,7 +171,7 @@ describe("GET /api/articles", () => {
 // Endpoint 5
 
 describe("GET /api/articles/:article_id/comments", () => {
-  test.only("status 200 and returns array of comments", () => {
+  test("status 200 and returns array of comments", () => {
     return request(app)
       .get("/api/articles/9/comments")
       .expect(200)
