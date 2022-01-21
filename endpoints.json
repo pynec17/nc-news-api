@@ -10,6 +10,7 @@
       "topics": [{ "slug": "football", "description": "Footie!" }]
     }
   },
+
   "GET /api/articles/:article_id": {
     "description": "Serves a json object of an article based on article_id",
     "queries": [],
@@ -24,10 +25,9 @@
       "author": "icellusedkars",
       "created_at": "2020-11-03T09:12:00.000Z",
       "comment_count": "2"
-    } }
-    
-
+    }}
   },
+
   "PATCH /api/articles/:article_id": {
     "description": "updates article vote count, returns article",
     "queries": [],
@@ -45,6 +45,7 @@
       }
     }
   },
+
   "GET /api/articles": {
     "description": "serves an array of all topics",
     "queries": ["topic", "sort_by", "order"],
@@ -78,8 +79,8 @@
           "created_at": "2020-04-06T12:17:00.000Z",
           "body": "The body..."
         }]
+  }
   },
-},
 
   "POST api/articles/:article_id/comments": {
     "description": "posts a comment to given article_id",
@@ -96,9 +97,12 @@
       "body": "Comment here"
     }}
   },
-
-
+  
   "DELETE /api/comments/:comment_id": {
-    "description": ""
+    "description": "deletes the given comment by comment_id",
+    "queries": [],
+    "parameters": [":comment_id"],
+    "exampleRequest": "/api/comments/2",
+    "exampleResponse": {}
   }
 }

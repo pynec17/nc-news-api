@@ -146,7 +146,6 @@ describe("GET /api/articles", () => {
             expect.objectContaining({
               article_id: expect.any(Number),
               title: expect.any(String),
-              body: expect.any(String),
               votes: expect.any(Number),
               topic: expect.any(String),
               author: expect.any(String),
@@ -294,13 +293,12 @@ describe("GET /api/articles/:article_id/comments", () => {
 // Endpoint 6 - Post new comment
 
 describe("POST /api/articles/:article_id/comments", () => {
-  test.only("returns status 201 and object containing posted comment ", () => {
+  test("returns status 201 and object containing posted comment ", () => {
     return request(app)
       .post("/api/articles/1/comments")
       .send({ username: "butter_bridge", body: "I like this" })
       .expect(201)
       .then((res) => {
-        console.log(res.body);
         expect(res.body.comment.article_id).toBe(1);
         expect(res.body.comment.author).toBe("butter_bridge");
         expect(res.body.comment.body).toBe("I like this");
