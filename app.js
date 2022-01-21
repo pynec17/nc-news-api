@@ -8,8 +8,15 @@ const {
 } = require("./controllers/articles.controller");
 const {
   getCommentsByArticleID,
+  postComment,
+  removeComment,
 } = require("./controllers/comments.controller.js");
-const { handle404s } = require("./errors.js");
+const {
+  handle404s,
+  handleCustomErrors,
+  handlePsqlErrors,
+  handleServerErrors,
+} = require("./errors.js");
 
 app.use(express.json());
 
@@ -18,22 +25,13 @@ app.get("/api/articles/:article_id", getArticleByID);
 app.patch("/api/articles/:article_id", patchArticleVotes);
 app.get("/api/articles", getArticles);
 app.get("/api/articles/:article_id/comments", getCommentsByArticleID);
+app.post("/api/articles/:article_id/comments", postComment);
+app.delete("/api/comments/:comment_id", removeComment);
 
 // errors
 app.all("*", handle404s);
-
-app.use((err, req, res, next) => {
-  if (err.status) {
-    res.status(err.status).send({ message: err.message });
-  } else {
-    next(err);
-  }
-});
-
-app.use((err, req, res, next) => {
-  if (err.code === "22P02") {
-    res.status(400).send({ message: "Bad Request" });
-  }
-});
+app.use(handlePsqlErrors);
+app.use(handleCustomErrors);
+app.use(handleServerErrors);
 
 module.exports = app;

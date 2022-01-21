@@ -2,6 +2,7 @@
   "GET /api": {
     "description": "serves up a json representation of all the available endpoints of the api"
   },
+
   "GET /api/topics": {
     "description": "serves an array of all topics",
     "queries": [],
@@ -9,19 +10,95 @@
       "topics": [{ "slug": "football", "description": "Footie!" }]
     }
   },
+  "GET /api/articles/:article_id": {
+    "description": "Serves a json object of an article based on article_id",
+    "queries": [],
+    "parameters": [":article_id"],
+    "exampleRequest": "/api/articles/1",
+    "exampleResponse": {"article": { 
+      ":article_id": 3,
+      "title": "Eight pug gifs that remind me of mitch",
+      "body": "some gifs",
+      "votes": 0,
+      "topic": "mitch",
+      "author": "icellusedkars",
+      "created_at": "2020-11-03T09:12:00.000Z",
+      "comment_count": "2"
+    } }
+    
+
+  },
+  "PATCH /api/articles/:article_id": {
+    "description": "updates article vote count, returns article",
+    "queries": [],
+    "parameters": [":article_id"],
+    "exampleRequest": "/api/articles/2",
+    "exampleRequestBody": {"inc_votes": 1},
+    "exampleResponse": {
+      "article": {
+        "article_id": 2,
+        "title": "Sony Vaio",
+        "votes": 10,
+        "topic": "mitch",
+        "author": "icellusedkars",
+        "created_at": "2020-10-16T05:03:00.000Z"
+      }
+    }
+  },
   "GET /api/articles": {
     "description": "serves an array of all topics",
-    "queries": ["author", "topic", "sort_by", "order"],
+    "queries": ["topic", "sort_by", "order"],
+    "parameters": [],
+    "exampleRequest": "/api/articles?topic=cats", 
     "exampleResponse": {
       "articles": [
         {
+          "article_id": 5,
           "title": "Seafood substitutions are increasing",
           "topic": "cooking",
           "author": "weegembump",
-          "body": "Text from the article..",
-          "created_at": 1527695953341
+          "created_at": "2020-10-16T05:03:00.000Z",
+          "votes": 0,
+          "comment_count": 0
         }
       ]
     }
+  },
+
+  "GET /api/articles/:article_id/comments": {
+    "description": "serves array of comments for the given article_id",
+    "parameters": [":article_id"],
+    "queries": [],
+    "exampleRequest": "/api/articles/1/comments",
+    "exampleResponse": {
+      "comments": [
+        {"comment_id": 1,
+          "author": "author_name",
+          "votes": 16,
+          "created_at": "2020-04-06T12:17:00.000Z",
+          "body": "The body..."
+        }]
+  },
+},
+
+  "POST api/articles/:article_id/comments": {
+    "description": "posts a comment to given article_id",
+    "queries": [],
+    "parameters": [":article_id"],
+    "exampleBody": { "username": "user", "body": "body"},
+    "exampleRequest": "/api/articles/1/comments",
+    "exampleResponse": {"comment": {
+      "comment_id": 1,
+      "author": "author_name",
+      "article_id": 1,
+      "votes": 0,
+      "created_at": "2020-10-16T05:03:00.000Z",
+      "body": "Comment here"
+    }}
+  },
+
+
+  "DELETE /api/comments/:comment_id": {
+    "description": ""
   }
 }

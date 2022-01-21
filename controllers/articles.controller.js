@@ -28,15 +28,14 @@ exports.patchArticleVotes = (req, res, next) => {
     });
 };
 
-exports.getArticles = (req, res) => {
+exports.getArticles = (req, res, next) => {
   const { sort_by, order, topic } = req.query;
 
   selectArticles(sort_by, order, topic)
     .then((articles) => {
-      console.log({ articles });
       res.status(200).send({ articles });
     })
     .catch((err) => {
-      console.log(err);
+      next(err);
     });
 };

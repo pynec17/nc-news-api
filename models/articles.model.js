@@ -28,8 +28,6 @@ exports.updateArticleVotes = (body, article_id) => {
       [body.inc_votes, article_id]
     )
     .then(({ rows }) => {
-      console.log(rows);
-      console.log(rows[0]);
       if (!rows[0]) {
         return Promise.reject({ status: 404, message: "No Data Found" });
       }
@@ -38,9 +36,9 @@ exports.updateArticleVotes = (body, article_id) => {
 };
 
 exports.selectArticles = (sort_by = "created_at", order = "desc", topic) => {
-  console.log(sort_by);
-  console.log(order);
-  console.log(topic);
+  // console.log(sort_by);
+  // console.log(order);
+  // console.log(topic);
 
   // create variable list and start of SQL
   const queryValues = [];
@@ -76,6 +74,9 @@ exports.selectArticles = (sort_by = "created_at", order = "desc", topic) => {
     sqlString += ` WHERE topic=$1 GROUP BY articles.article_id ORDER BY ${sort_by} ${order};`;
 
     return db.query(sqlString, [topic]).then(({ rows }) => {
+      if (!rows[0]) {
+        return Promise.reject({ status: 404, message: "Nothing Found" });
+      }
       return rows;
     });
   } else {
