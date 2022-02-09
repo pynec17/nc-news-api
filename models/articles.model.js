@@ -45,9 +45,15 @@ exports.selectArticles = (sort_by = "created_at", order = "desc", topic) => {
 
   // sort_by conditional logic - error
   if (
-    !["article_id", "title", "votes", "topic", "author", "created_at"].includes(
-      sort_by
-    )
+    ![
+      "article_id",
+      "title",
+      "votes",
+      "topic",
+      "author",
+      "created_at",
+      "comment_count",
+    ].includes(sort_by)
   ) {
     return Promise.reject({ status: 400, message: "Invalid sort_by" });
   }
