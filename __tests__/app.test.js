@@ -157,7 +157,12 @@ describe("GET /api/articles", () => {
       });
   });
 
-  // test one of sort_by/order
+  test.only("testing out limit ", () => {
+    return request(app)
+      .get("/api/articles?limit=10")
+      .expect(200)
+      .then(() => {});
+  });
   // test invalid query
   test("returns status 200 and array of articles - no queries, default values of sort_by=created_at and otder=desc are applied", () => {
     return request(app)
@@ -385,3 +390,118 @@ describe("DELETE /api/comments/:comment_id", () => {
       });
   });
 });
+
+// Endpoint 8 - Get all users
+
+describe("GET /api/users", () => {
+  test("returns status 200 and array of users", () => {
+    return request(app)
+      .get("/api/users")
+      .expect(200)
+      .then((res) => {
+        expect(res.body.users).toHaveLength(4);
+        res.body.users.forEach((user) => {
+          expect(user).toEqual(
+            expect.objectContaining({
+              username: expect.any(String),
+            })
+          );
+        });
+      });
+  });
+  test("returns status 400 and error", () => {
+    return request(app)
+      .get("/api/userss")
+      .expect(404)
+      .then((res) => {
+        expect(res.body.message).toEqual("Invalid URL");
+      });
+  });
+});
+
+// Endpoint 9 - Get specific user
+describe("GET /api/users/:username", () => {
+  test("returns status 200 and specific user", () => {
+    return request(app)
+      .get("/api/users/rogersop")
+      .expect(200)
+      .then((res) => {
+        expect(res.body.user.username).toEqual("rogersop");
+        expect(res.body.user).toEqual(
+          expect.objectContaining({
+            username: expect.any(String),
+            name: expect.any(String),
+            avatar_url: expect.any(String),
+          })
+        );
+      });
+  });
+  test("returns status 404 - user out of range", () => {
+    return request(app)
+      .get("/api/users/newuser")
+      .expect(404)
+      .then((res) => {
+        expect(res.body.message).toEqual("No user found");
+      });
+  });
+  // test.only("returns status 400 - invalid username data type", () => {
+  //   return request(app)
+  //     .get("/api/users/34")
+  //     .expect(400)
+  //     .then((res) => {
+  //       console.log(res);
+  //     });
+  // });
+});
+
+// Endpoint 10 - Update comment vote count
+describe("PATCH /api/comments/:comment_id", () => {
+  test("returns status 200 & object with updated comment", () => {
+    return request(app)
+      .patch("/api/comments/5")
+      .send({ inc_votes: 1 })
+      .expect(200)
+      .then((res) => {
+        expect(res.body.comment.votes).toBe(1);
+        expect(res.body.comment).toEqual(
+          expect.objectContaining({
+            comment_id: expect.any(Number),
+            author: expect.any(String),
+            article_id: expect.any(Number),
+            votes: expect.any(Number),
+            created_at: expect.any(String),
+            body: expect.any(String),
+          })
+        );
+      });
+  });
+  test("returns status 400 and error - invalid input type", () => {
+    return request(app)
+      .patch("/api/comments/5")
+      .send({ inc_votes: "a" })
+      .expect(400)
+      .then((res) => {
+        expect(res.body.message).toEqual("Bad Request");
+      });
+  });
+  test("returns status 400 and error - empty body", () => {
+    return request(app)
+      .patch("/api/comments/5")
+      .send({})
+      .expect(400)
+      .then((res) => {
+        expect(res.body.message).toEqual("Bad Request");
+      });
+  });
+  test("returns status 404 and error - comment_id out of range", () => {
+    return request(app)
+      .patch("/api/comments/500")
+      .send({ inc_votes: 1 })
+      .expect(404)
+      .then((res) => {
+        expect(res.body.message).toEqual("No comment found");
+      });
+  });
+});
+
+// Endpoint 11 -

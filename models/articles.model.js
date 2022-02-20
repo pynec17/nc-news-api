@@ -35,7 +35,12 @@ exports.updateArticleVotes = (body, article_id) => {
     });
 };
 
-exports.selectArticles = (sort_by = "created_at", order = "desc", topic) => {
+exports.selectArticles = (
+  sort_by = "created_at",
+  order = "desc",
+  topic,
+  limit = 10
+) => {
   // create variable list and start of SQL
   const queryValues = [];
   let sqlString = `SELECT articles.article_id, articles.title, articles.votes, articles.topic, articles.author, articles.created_at, COUNT(comment_id) AS comment_count

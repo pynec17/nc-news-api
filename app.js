@@ -10,6 +10,7 @@ const {
   getCommentsByArticleID,
   postComment,
   removeComment,
+  patchCommentVotes,
 } = require("./controllers/comments.controller.js");
 const {
   handle404s,
@@ -18,6 +19,8 @@ const {
   handleServerErrors,
 } = require("./errors.js");
 const endpoints = require("./endpoints.json");
+const { application } = require("express");
+const { getAllUsers, getUser } = require("./controllers/users.controller.js");
 
 const app = express();
 
@@ -35,6 +38,9 @@ app.get("/api/articles", getArticles);
 app.get("/api/articles/:article_id/comments", getCommentsByArticleID);
 app.post("/api/articles/:article_id/comments", postComment);
 app.delete("/api/comments/:comment_id", removeComment);
+app.get("/api/users", getAllUsers);
+app.get("/api/users/:username", getUser);
+app.patch("/api/comments/:comment_id", patchCommentVotes);
 
 // errors
 app.all("*", handle404s);
