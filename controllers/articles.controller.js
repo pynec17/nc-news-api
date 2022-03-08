@@ -2,6 +2,7 @@ const {
   selectArticleByID,
   updateArticleVotes,
   selectArticles,
+  insertArticle,
 } = require("../models/articles.model.js");
 
 exports.getArticleByID = (req, res, next) => {
@@ -18,7 +19,6 @@ exports.getArticleByID = (req, res, next) => {
 
 exports.patchArticleVotes = (req, res, next) => {
   const { article_id } = req.params;
-
   updateArticleVotes(req.body, article_id)
     .then((article) => {
       res.status(200).send({ article });
@@ -29,13 +29,16 @@ exports.patchArticleVotes = (req, res, next) => {
 };
 
 exports.getArticles = (req, res, next) => {
-  const { sort_by, order, topic, limit } = req.query;
-  console.log(limit);
-  selectArticles(sort_by, order, topic, limit)
+  const { sort_by, order, topic, limit, p } = req.query;
+  selectArticles(sort_by, order, topic, limit, p)
     .then((articles) => {
       res.status(200).send({ articles });
     })
     .catch((err) => {
       next(err);
     });
+};
+
+exports.postArticle = (req, res) => {
+  insertArticle();
 };

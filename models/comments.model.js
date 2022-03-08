@@ -1,10 +1,12 @@
 const db = require("../db/connection");
 
-exports.selectCommentsByArticleId = (article_id) => {
+exports.selectCommentsByArticleId = (article_id, limit = 10, p = 1) => {
+  const offset = limit * p - limit;
+
   return db
     .query(
-      "SELECT * FROM comments WHERE article_id=$1 ORDER BY created_at DESC;",
-      [article_id]
+      "SELECT * FROM comments WHERE article_id=$1 ORDER BY created_at DESC LIMIT $2 OFFSET $3;",
+      [article_id, limit, offset]
     )
     .then(({ rows }) => {
       if (!rows[0]) {
@@ -18,7 +20,6 @@ exports.insertComment = (username, body, article_id) => {
   if (!username || !body) {
     return Promise.reject({ status: 400, message: "Bad Request" });
   }
-
   return db
     .query(
       `INSERT INTO comments (author, body, article_id) VALUES ($1, $2, $3) RETURNING *`,

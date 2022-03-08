@@ -7,7 +7,6 @@ exports.selectUsers = () => {
 };
 
 exports.selectUser = (username) => {
-  // console.log(typeof username);
   return db
     .query("SELECT * FROM users WHERE username=$1", [username])
     .then(({ rows }) => {

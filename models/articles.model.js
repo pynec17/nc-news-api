@@ -39,12 +39,13 @@ exports.selectArticles = (
   sort_by = "created_at",
   order = "desc",
   topic,
-  limit = 10
+  limit = 10,
+  p = 1
 ) => {
   // create variable list and start of SQL
   const queryValues = [];
-  let sqlString = `SELECT articles.article_id, articles.title, articles.votes, articles.topic, articles.author, articles.created_at, COUNT(comment_id) AS comment_count
-  FROM articles 
+  let sqlString = `SELECT articles.article_id, articles.title, articles.votes, articles.topic, articles.author, articles.created_at, COUNT(comment_id) AS comment_count, COUNT(*) OVER() AS full_count
+  FROM articles
   LEFT JOIN comments 
   ON articles.article_id = comments.article_id`;
 
@@ -72,19 +73,23 @@ exports.selectArticles = (
 
   if (topic) {
     queryValues.push(topic);
-    sqlString += ` WHERE topic=$1 GROUP BY articles.article_id ORDER BY ${sort_by} ${order};`;
+    sqlString += ` WHERE topic=$1 GROUP BY articles.article_id ORDER BY ${sort_by} ${order}`;
 
     return db.query(sqlString, [topic]).then(({ rows }) => {
-      if (!rows[0]) {
-        return Promise.reject({ status: 404, message: "Nothing Found" });
-      }
+      // if (!rows[0]) {
+      //   return Promise.reject({ status: 404, message: "Nothing Found" });
+      // }
       return rows;
     });
   } else {
-    sqlString += ` GROUP BY articles.article_id ORDER BY ${sort_by} ${order};`;
+    sqlString += ` GROUP BY articles.article_id ORDER BY ${sort_by} ${order}`;
+
+    sqlString += ` LIMIT ${limit} OFFSET ${p * limit - limit};`;
 
     return db.query(sqlString).then(({ rows }) => {
       return rows;
     });
   }
 };
+
+exports.insertArticle = () => {};
