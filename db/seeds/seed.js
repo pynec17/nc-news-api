@@ -21,11 +21,11 @@ const seed = (data) => {
       .then(() => {
         return db.query(`CREATE TABLE topics (
         slug TEXT PRIMARY KEY NOT NULL,
-        description TEXT);`);
+        description TEXT NOT NULL);`);
       })
       .then(() => {
         return db.query(`CREATE TABLE users (
-          username TEXT PRIMARY KEY,
+          username TEXT PRIMARY KEY NOT NULL,
           name TEXT,
           avatar_url TEXT
         );`);
@@ -48,7 +48,7 @@ const seed = (data) => {
         article_id INT REFERENCES articles(article_id),
         votes INT DEFAULT 0,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        body TEXT
+        body TEXT NOT NULL
       )`);
       })
       .then(() => {
