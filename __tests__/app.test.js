@@ -28,6 +28,14 @@ describe("GET /api/topics", () => {
       .expect(200)
       .then((res) => {
         expect(res.body.topics.length).toBe(3);
+        res.body.topics.forEach((topic) => {
+          expect(topic).toEqual(
+            expect.objectContaining({
+              slug: expect.any(String),
+              description: expect.any(String),
+            })
+          );
+        });
       });
   });
   test("returns status 404 and error message", () => {
@@ -70,7 +78,7 @@ describe("GET /api/articles/:article_id", () => {
         expect(res.body.message).toBe("No Data Found");
       });
   });
-  test("returns 404 not found if article_id out of range", () => {
+  test("returns 404 not found if article_id wrong data type", () => {
     return request(app)
       .get("/api/articles/g")
       .expect(400)
@@ -130,6 +138,15 @@ describe("PATCH /api/articles/:article_id", () => {
         expect(res.body.message).toBe("No Data Found");
       });
   });
+  test("return status 404 and not-an-id - invalid ID", () => {
+    return request(app)
+      .patch("/api/articles/a")
+      .send({ inc_votes: 1 })
+      .expect(400)
+      .then((res) => {
+        expect(res.body.message).toBe("Bad Request");
+      });
+  });
 });
 
 // Endpoint 4 - Get all articles
@@ -140,7 +157,7 @@ describe("GET /api/articles", () => {
       .get("/api/articles")
       .expect(200)
       .then((res) => {
-        expect(res.body.articles).toHaveLength(12);
+        expect(res.body.articles).toHaveLength(10);
         res.body.articles.forEach((article) => {
           expect(article).toEqual(
             expect.objectContaining({
@@ -157,12 +174,6 @@ describe("GET /api/articles", () => {
       });
   });
 
-  test.only("testing out limit ", () => {
-    return request(app)
-      .get("/api/articles?limit=10")
-      .expect(200)
-      .then(() => {});
-  });
   // test invalid query
   test("returns status 200 and array of articles - no queries, default values of sort_by=created_at and otder=desc are applied", () => {
     return request(app)
@@ -185,6 +196,15 @@ describe("GET /api/articles", () => {
           return article.title;
         });
         expect(titleArray).toBeSorted({ descending: true });
+      });
+  });
+
+  test("returns status 200 - valid topic query but no results ", () => {
+    return request(app)
+      .get("/api/articles?topic=sewing")
+      .expect(200)
+      .then((res) => {
+        expect(res.body.articles.length).toBe(0);
       });
   });
 
@@ -222,6 +242,16 @@ describe("GET /api/articles", () => {
         });
       });
   });
+
+  test("return status 200 - limit=5, page=2, sort_by=article_id, order=asc ", () => {
+    return request(app)
+      .get("/api/articles?limit=5&p=2&sort_by=article_id&order=asc")
+      .expect(200)
+      .then((res) => {
+        expect(res.body.articles.length).toBe(5);
+        expect(res.body.articles[0].article_id).toBe(6);
+      });
+  });
   // Errors
   /*
   Invalid query name?
@@ -243,15 +273,6 @@ describe("GET /api/articles", () => {
         expect(res.body.message).toBe("Invalid order");
       });
   });
-  test("Returns error 400 if topic doesn't exist", () => {
-    return request(app)
-      .get("/api/articles?topic=dogs")
-      .expect(404)
-      .then((res) => {
-        expect(res.body.message).toBe("Nothing Found");
-      });
-  });
-  // if topic exists but not in any article?
 });
 
 // Endpoint 5 - Get all comments by article_id
@@ -262,6 +283,7 @@ describe("GET /api/articles/:article_id/comments", () => {
       .get("/api/articles/9/comments")
       .expect(200)
       .then((res) => {
+        expect(res.body.comments.length).toBe(2);
         res.body.comments.forEach((comment) => {
           expect(comment.article_id).toBe(9);
           expect(comment).toEqual(
@@ -274,6 +296,15 @@ describe("GET /api/articles/:article_id/comments", () => {
             })
           );
         });
+      });
+  });
+
+  test("status 200 - testing p and limit", () => {
+    return request(app)
+      .get("/api/articles/9/comments?limit=1&p=1")
+      .expect(200)
+      .then((res) => {
+        expect(res.body.comments.length).toBe(1);
       });
   });
 
@@ -315,9 +346,9 @@ describe("POST /api/articles/:article_id/comments", () => {
     return request(app)
       .post("/api/articles/1000/comments")
       .send({ username: "butter_bridge", body: "I like this" })
-      .expect(400)
+      .expect(404)
       .then((res) => {
-        expect(res.body.message).toBe("Bad Request");
+        expect(res.body.message).toBe("Not Found");
       });
   });
 
@@ -354,9 +385,21 @@ describe("POST /api/articles/:article_id/comments", () => {
     return request(app)
       .post("/api/articles/2/comments")
       .send({ username: "new_user", body: "I like this" })
-      .expect(400)
+      .expect(404)
       .then((res) => {
-        expect(res.body.message).toBe("Bad Request");
+        expect(res.body.message).toBe("Not Found");
+      });
+  });
+  test("return status 201 - ignores unnecessary properties", () => {
+    return request(app)
+      .post("/api/articles/2/comments")
+      .send({ username: "butter_bridge", body: "I like this", votes: 100 })
+      .expect(201)
+      .then((res) => {
+        expect(res.body.comment.article_id).toBe(2);
+        expect(res.body.comment.author).toBe("butter_bridge");
+        expect(res.body.comment.body).toBe("I like this");
+        expect(res.body.comment.votes).toBe(0);
       });
   });
 });
@@ -387,6 +430,18 @@ describe("DELETE /api/comments/:comment_id", () => {
       .expect(404)
       .then((res) => {
         expect(res.body.message).toBe("Not Found");
+      });
+  });
+});
+
+// GET /api
+describe("GET /api", () => {
+  test("returns status 200 and JSON describing all endpoints", () => {
+    return request(app)
+      .get("/api")
+      .expect(200)
+      .then((res) => {
+        expect(typeof res.body).toBe("object");
       });
   });
 });
@@ -504,4 +559,18 @@ describe("PATCH /api/comments/:comment_id", () => {
   });
 });
 
-// Endpoint 11 -
+// Endpoint 11 - Post a new article
+// describe("POST /api/articles", () => {
+//   test("return status 200 and object with newly added article ", () => {
+//     return request(app)
+//       .post("/api/articles")
+//       .send({
+//         author: "username",
+//         title: "A new article",
+//         body: "this is the body of a new article",
+//         topic: "football",
+//       })
+//       .expect(200)
+//       .then((res) => {});
+//   });
+// });
