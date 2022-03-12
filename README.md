@@ -181,3 +181,65 @@ Responds with:
 - status 204 and no content
 
 ---
+
+### **GET /api/users**
+
+Responds with:
+
+- an array of objects, each object should have the following property:
+  - `username`
+
+---
+
+### **GET /api/users/:username**
+
+Responds with:
+
+- a user object which should have the following properties:
+  - `username`
+  - `avatar_url`
+  - `name`
+
+---
+
+#### **PATCH /api/comments/:comment_id**
+
+Request body accepts:
+
+- an object in the form `{ inc_votes: newVote }`
+
+  - where `newVote` indicates the amount to update the vote count by
+
+  e.g.
+
+  `{ inc_votes : 1 }` would increment the current comment's vote property by 1
+
+  `{ inc_votes : -1 }` would decrement the current comment's vote property by 1
+
+Responds with:
+
+- the updated comment
+
+---
+
+#### **POST /api/articles**
+
+Request body accepts:
+
+- an object with the following properties:
+
+  - `author` which is the `username` from the users table
+  - `title`
+  - `body`
+  - `topic`
+
+Responds with:
+
+- the newly added article, with all the above properties as well as:
+
+  - `article_id`
+  - `votes`
+  - `created_at`
+  - `comment_count`
+
+  ***

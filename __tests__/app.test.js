@@ -560,17 +560,74 @@ describe("PATCH /api/comments/:comment_id", () => {
 });
 
 // Endpoint 11 - Post a new article
-// describe("POST /api/articles", () => {
-//   test("return status 200 and object with newly added article ", () => {
-//     return request(app)
-//       .post("/api/articles")
-//       .send({
-//         author: "username",
-//         title: "A new article",
-//         body: "this is the body of a new article",
-//         topic: "football",
-//       })
-//       .expect(200)
-//       .then((res) => {});
-//   });
-// });
+describe("POST /api/articles", () => {
+  test.only("return status 200 and object with newly added article ", () => {
+    return request(app)
+      .post("/api/articles")
+      .send({
+        author: "lurker",
+        title: "A new article",
+        body: "This is the body of a new article",
+        topic: "cats",
+      })
+      .expect(201)
+      .then((res) => {
+        console.log(res.body.article);
+        expect(res.body.article.article_id).toBe(13);
+        expect(res.body.article.author).toBe("lurker");
+        expect(res.body.article.title).toBe("A new article");
+        expect(res.body.article.body).toBe("This is the body of a new article");
+        expect(res.body.article.topic).toBe("cats");
+        expect(res.body.article).toEqual(
+          expect.objectContaining({
+            article_id: expect.any(Number),
+            title: expect.any(String),
+            body: expect.any(String),
+            votes: expect.any(Number),
+            topic: expect.any(String),
+            author: expect.any(String),
+            created_at: expect.any(String),
+          })
+        );
+      });
+  });
+
+  test("returns status 400 Bad Request - missing field", () => {
+    return request(app)
+      .post("/api/articles")
+      .send({
+        title: "A new article",
+        body: "This is the body of a new article",
+        topic: "cats",
+      })
+      .expect(400)
+      .then((res) => {
+        expect(res.body.message).toBe("Missing Data");
+      });
+  });
+
+  test("returns status 400 Bad Request - empty body", () => {
+    return request(app)
+      .post("/api/articles")
+      .send({})
+      .expect(400)
+      .then((res) => {
+        expect(res.body.message).toBe("Missing Data");
+      });
+  });
+
+  test("returns status 400 Bad Request - Username doesn't exist", () => {
+    return request(app)
+      .post("/api/articles")
+      .send({
+        author: "user1",
+        title: `"A new article"`,
+        body: "article body",
+        topic: "cats",
+      })
+      .expect(404)
+      .then((res) => {
+        expect(res.body.message).toBe("Not Found");
+      });
+  });
+});

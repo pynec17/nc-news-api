@@ -92,4 +92,17 @@ exports.selectArticles = (
   }
 };
 
-exports.insertArticle = () => {};
+exports.insertArticle = ({ author, title, body, topic }) => {
+  if (!author || !title || !body || !topic) {
+    return Promise.reject({ status: 400, message: "Missing Data" });
+  }
+
+  return db
+    .query(
+      `INSERT INTO articles (author, title, body, topic) VALUES ($1, $2, $3, $4) RETURNING *`,
+      [author, title, body, topic]
+    )
+    .then(({ rows }) => {
+      return rows[0];
+    });
+};

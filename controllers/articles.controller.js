@@ -39,6 +39,12 @@ exports.getArticles = (req, res, next) => {
     });
 };
 
-exports.postArticle = (req, res) => {
-  insertArticle();
+exports.postArticle = (req, res, next) => {
+  insertArticle(req.body)
+    .then((article) => {
+      res.status(201).send({ article });
+    })
+    .catch((err) => {
+      next(err);
+    });
 };

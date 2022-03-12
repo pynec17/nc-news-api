@@ -12,13 +12,16 @@ const {
 
 const articlesRouter = express.Router();
 
+// "api/articles/:article_id"
 articlesRouter
   .route("/:article_id")
   .get(getArticleByID)
   .patch(patchArticleVotes);
 
+// "api/articles"
 articlesRouter.route("/").get(getArticles).post(postArticle);
 
+// "api/articles/:article_id/comments"
 articlesRouter
   .route("/:article_id/comments")
   .get(getCommentsByArticleID)

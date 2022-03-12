@@ -48,7 +48,7 @@
 
   "GET /api/articles": {
     "description": "serves an array of all articles",
-    "queries": ["topic", "sort_by", "order"],
+    "queries": ["topic", "sort_by", "order", "p", "limit"],
     "parameters": [],
     "exampleRequest": "/api/articles?topic=cats", 
     "exampleResponse": {
@@ -69,7 +69,7 @@
   "GET /api/articles/:article_id/comments": {
     "description": "serves array of comments for the given article_id",
     "parameters": [":article_id"],
-    "queries": [],
+    "queries": ["p", "limit"],
     "exampleRequest": "/api/articles/1/comments",
     "exampleResponse": {
       "comments": [
@@ -104,5 +104,73 @@
     "parameters": [":comment_id"],
     "exampleRequest": "/api/comments/2",
     "exampleResponse": {}
+  },
+
+  "GET /api/users": {
+    "description": "serves an array of objects with each object having a username property",
+    "queries": [],
+    "parameters": [],
+    "exampleRequest": "/api/users",
+    "exampleResponse": {
+      "users": [
+        {"username": "user1"},
+        {"usermame": "user2"}
+      ]
+    }
+  },
+
+  "GET /api/users/:username": {
+    "description": "returns a user object",
+    "queries": [],
+    "parameters": [":username"],
+    "exampleRequest": "/api/users/user1",
+    "exampleResponse": {
+      "user": {
+        "username": "user1" ,
+        "name": "Steve",
+        "avatar_url": "www.image.url"
+      }
+    }
+  },
+
+  "PATCH /api/comments/comment": {
+    "description": "updates comment vote count",
+    "queries": [],
+    "parameters": [":comment_id"],
+    "exampleBody": { "inc_votes" : 1},
+    "exampleRequest": "/api/comments/200",
+    "exampleResponse": {
+      "comment":{ 
+        "comment_id": 200,
+        "author": "author_name",
+        "article_id": 10,
+        "votes": 16,
+        "created_at": "2020-04-06T12:17:00.000Z",
+        "body": "The body..."
+      } 
+    }
+  },
+
+  "POST /api/articles": {
+    "description": "Posts a new article, returns new article as response",
+    "queries": [],
+    "parameters": [],
+    "exampleBody": {
+      "author": "lurker",
+      "title": "A new article",
+      "body": "This is the body of a new article",
+      "topic": "cats"
+    },
+    "exampleRequest": "/api/articles",
+    "exampleResponse": {
+      "article_id": 13,
+      "title": "A new article",
+      "body": "This is the body of a new article",
+      "votes": 0,
+      "topic": "cats",
+      "author": "lurker",
+      "created_at": "2022-03-12T16:22:40.801Z"
+    }
   }
 }
+
