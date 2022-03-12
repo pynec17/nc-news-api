@@ -202,7 +202,7 @@ Responds with:
 
 ---
 
-#### **PATCH /api/comments/:comment_id**
+### **PATCH /api/comments/:comment_id**
 
 Request body accepts:
 
@@ -222,7 +222,7 @@ Responds with:
 
 ---
 
-#### **POST /api/articles**
+### **POST /api/articles**
 
 Request body accepts:
 
@@ -243,3 +243,34 @@ Responds with:
   - `comment_count`
 
   ***
+
+### **POST /api/topics**
+
+Request body accepts:
+
+- an object in the form:
+
+```
+{
+"slug": "topic name here",
+"description": "description here"
+}
+```
+
+Responds with:
+
+- a topic object containing the newly added topic
+
+---
+
+  <br>
+
+### **DELETE /api/articles/:article_id**
+
+Should:
+
+- delete the given article by article_id
+
+Respond with:
+
+- status 204 and no content

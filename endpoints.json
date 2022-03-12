@@ -162,7 +162,8 @@
       "topic": "cats"
     },
     "exampleRequest": "/api/articles",
-    "exampleResponse": {
+    "exampleResponse": 
+    {"article": {
       "article_id": 13,
       "title": "A new article",
       "body": "This is the body of a new article",
@@ -171,6 +172,30 @@
       "author": "lurker",
       "created_at": "2022-03-12T16:22:40.801Z"
     }
+  }
+  },
+
+  "POST /api/topics": {
+    "description": "Posts a new topic, returns new topic as response",
+    "queries": [],
+    "parameters": [],
+    "exampleBody": {
+      "slug": "reading",
+      "description": "articles abut books"
+    },
+    "exampleRequest": "/api/topics",
+    "exampleResponse": {"topic": {
+      "slug": "reading",
+      "description": "articles abut books"
+    }}
+  },
+
+  "DELETE /api/articles/:article_id": {
+    "description": "Deletes article, returns status 204",
+    "queries": [],
+    "parameters": [":article_id"],
+    "exampleRequest": "/api/articles/5",
+    "exampleResponse:": {}
   }
 }
 
