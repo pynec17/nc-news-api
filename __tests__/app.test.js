@@ -561,7 +561,7 @@ describe("PATCH /api/comments/:comment_id", () => {
 
 // Endpoint 11 - Post a new article
 describe("POST /api/articles", () => {
-  test.only("return status 200 and object with newly added article ", () => {
+  test("return status 200 and object with newly added article ", () => {
     return request(app)
       .post("/api/articles")
       .send({
@@ -572,7 +572,6 @@ describe("POST /api/articles", () => {
       })
       .expect(201)
       .then((res) => {
-        console.log(res.body.article);
         expect(res.body.article.article_id).toBe(13);
         expect(res.body.article.author).toBe("lurker");
         expect(res.body.article.title).toBe("A new article");
@@ -628,6 +627,69 @@ describe("POST /api/articles", () => {
       .expect(404)
       .then((res) => {
         expect(res.body.message).toBe("Not Found");
+      });
+  });
+});
+
+// Endpoint 12 - Post a new topic
+describe("POST /api/topics", () => {
+  test("returns status 200 OK and object containing new topic", () => {
+    return request(app)
+      .post("/api/topics")
+      .send({
+        slug: "reading",
+        description: "articles about books",
+      })
+      .expect(201)
+      .then((res) => {
+        expect(res.body.topic.slug).toBe("reading");
+        expect(res.body.topic.description).toBe("articles about books");
+        expect(res.body.topic).toEqual(
+          expect.objectContaining({
+            slug: expect.any(String),
+            description: expect.any(String),
+          })
+        );
+      });
+  });
+
+  test("returns status 400 Bad Request - Missing data", () => {
+    return request(app)
+      .post("/api/topics")
+      .send({})
+      .expect(400)
+      .expect((res) => {
+        expect(res.body.message).toBe("Missing Data");
+      });
+  });
+});
+
+// Endpoint 13 - Delete article
+describe("DELETE /api/articles/:article_id", () => {
+  test("returns status 204 - article removed", () => {
+    return request(app)
+      .delete("/api/articles/5")
+      .expect(204)
+      .then((res) => {
+        expect(res.body).toEqual({});
+      });
+  });
+
+  test("returns status 404 - article_id out of range ", () => {
+    return request(app)
+      .delete("/api/articles/50")
+      .expect(404)
+      .then((res) => {
+        expect(res.body.message).toBe("Not Found");
+      });
+  });
+
+  test("returns status 400 - invalid data type", () => {
+    return request(app)
+      .delete("/api/articles/a")
+      .expect(400)
+      .then((res) => {
+        expect(res.body.message).toBe("Bad Request");
       });
   });
 });
