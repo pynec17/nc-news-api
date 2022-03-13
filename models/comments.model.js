@@ -5,7 +5,7 @@ exports.selectCommentsByArticleId = (article_id, limit = 10, p = 1) => {
 
   return db
     .query(
-      "SELECT *, COUNT(*) OVER() AS full_count FROM comments WHERE article_id=$1 ORDER BY created_at DESC LIMIT $2 OFFSET $3;",
+      "SELECT *, COUNT(*) OVER() AS total_count FROM comments WHERE article_id=$1 ORDER BY created_at DESC LIMIT $2 OFFSET $3;",
       [article_id, limit, offset]
     )
     .then(({ rows }) => {

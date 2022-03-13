@@ -44,7 +44,7 @@ exports.selectArticles = (
 ) => {
   // create variable list and start of SQL
   const queryValues = [];
-  let sqlString = `SELECT articles.article_id, articles.title, articles.votes, articles.topic, articles.author, articles.created_at, COUNT(comment_id) AS comment_count, COUNT(*) OVER() AS full_count
+  let sqlString = `SELECT articles.article_id, articles.title, articles.votes, articles.topic, articles.author, articles.created_at, COUNT(comment_id) AS comment_count, COUNT(*) OVER() AS total_count
   FROM articles
   LEFT JOIN comments 
   ON articles.article_id = comments.article_id`;
